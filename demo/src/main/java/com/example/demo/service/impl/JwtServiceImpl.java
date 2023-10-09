@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -21,16 +23,20 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtServiceImpl implements JwtService{
 
-	@Value("$(token.signing.key)")
+	private static final Logger logger = LoggerFactory.getLogger(JwtServiceImpl.class);
+	
+	@Value("${token.signing.key}")
 	private String jwtSigningKey;
 	
 	@Override
 	public String extractUserName(String token) {
+		
 		return extractClaim(token, Claims::getSubject);
 	}
 
 	private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
 		final Claims claims = extracAllClaims(token);
+		
 		return claimsResolvers.apply(claims);
 	}
 
@@ -43,6 +49,7 @@ public class JwtServiceImpl implements JwtService{
 	}
 
 	private Key getSigningKey() {
+		
 		byte[] keyBytes = Decoders.BASE64.decode(jwtSigningKey);
 		return Keys.hmacShaKeyFor(keyBytes);
 	}
@@ -53,6 +60,7 @@ public class JwtServiceImpl implements JwtService{
 	}
 
 	private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+		
 		return Jwts.builder()
 				.setClaims(extraClaims)
 				.setSubject(userDetails.getUsername())

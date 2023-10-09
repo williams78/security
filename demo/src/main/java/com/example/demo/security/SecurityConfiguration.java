@@ -1,5 +1,4 @@
 package com.example.demo.security;
-import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +27,7 @@ public class SecurityConfiguration {
 	private final UserService userService;
 		
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		
 		http
 			.csrf(AbstractHttpConfigurer::disable)
@@ -43,12 +42,12 @@ public class SecurityConfiguration {
 	}
 	
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	 PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
-	public AuthenticationProvider authenticationProvider() {
+	 AuthenticationProvider authenticationProvider() {
 		
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 		authProvider.setUserDetailsService(userService.UserDetailsService());
@@ -59,7 +58,7 @@ public class SecurityConfiguration {
 	
 	
 	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+	 AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 		
 		return config.getAuthenticationManager();
 		

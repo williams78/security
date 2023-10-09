@@ -3,11 +3,12 @@ package com.example.demo.security;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -28,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtService jwtService;
 	private final UserService userService;
-	
+	private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 	@Override
 	protected void doFilterInternal(@NonNull HttpServletRequest request,
 									@NonNull HttpServletResponse response,
@@ -41,15 +42,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		
 		
 		if(StringUtils.isEmpty(authHeader) ||
-				!StringUtils.startsWith(authHeader, "Bearer")) {
-			
+				!StringUtils.startsWith(authHeader, "Bearer ")) {
+			logger.info("entro");
 			    filterChain.doFilter(request, response);
 			    return;
 		}
-		
+		logger.info("22");
 		jwt = authHeader.substring(7);
 		userEmail = jwtService.extractUserName(jwt);
-		
+		logger.info(userEmail);
 		if(StringUtils.isNoneEmpty(userEmail) &&
 				SecurityContextHolder.getContext().getAuthentication() == null) {
 			
