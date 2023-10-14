@@ -19,10 +19,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name="users")
 public class User implements UserDetails{
@@ -44,6 +44,11 @@ public class User implements UserDetails{
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return List.of(new SimpleGrantedAuthority(role.name()));
 	}
+
+	@Override
+	public String getUsername() {
+		return email;
+	}
 	
 	@Override
 	public boolean isAccountNonExpired() {
@@ -57,7 +62,7 @@ public class User implements UserDetails{
 	
 	@Override
 	public boolean isCredentialsNonExpired() {
-		return false;
+		return true;
 	}
 	
 	@Override

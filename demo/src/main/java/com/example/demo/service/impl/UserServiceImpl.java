@@ -17,14 +17,14 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService{
 
 	private final UserRepository userRepository;
-	//private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 	@Override
-	public UserDetailsService UserDetailsService() {
+	public UserDetailsService userDetailsService() {
 		return new UserDetailsService() {
 			
 			@Override
 			public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-				
+			    	
 			    return userRepository.findByEmail(username)
 			    		.orElseThrow(() -> new UsernameNotFoundException("User no encontrado"));
 			}

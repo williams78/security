@@ -1,4 +1,6 @@
-package com.example.demo.security;
+ package com.example.demo.security;
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.demo.service.UserService;
 
@@ -29,17 +34,24 @@ public class SecurityConfiguration {
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		
-		http
-			.csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests((authz) -> authz.requestMatchers("/api/v1/auth/**").permitAll()
-            .anyRequest().authenticated())
-            .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(
-                    jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+		 http.headers(headers->headers.frameOptions(frame->frame.disable()));
+
+		 http.cors(cors->cors.disable());
+		
+		 http.csrf(AbstractHttpConfigurer::disable)
+		 
+         .authorizeHttpRequests(request -> request.requestMatchers("/api/v1/resource/**").permitAll()
+        		 .requestMatchers("/api/v1/auth/**")
+                 .permitAll().anyRequest().authenticated())
+         .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+         .authenticationProvider(authenticationProvider()).addFilterBefore(
+                 jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+         ;
 		
     return http.build();		
 	}
+	
+	
 	
 	@Bean
 	 PasswordEncoder passwordEncoder() {
@@ -50,7 +62,7 @@ public class SecurityConfiguration {
 	 AuthenticationProvider authenticationProvider() {
 		
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(userService.UserDetailsService());
+		authProvider.setUserDetailsService(userService.userDetailsService());
 		authProvider.setPasswordEncoder(passwordEncoder());
 		
 		return authProvider;
