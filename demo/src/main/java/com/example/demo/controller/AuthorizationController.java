@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,16 +28,31 @@ public class AuthorizationController {
 	private final IGeneric<PacienteResponse, PacienteRequest> pacienteService;
 	private static final Logger logger = LoggerFactory.getLogger(AuthorizationController.class);
 	
-	@GetMapping("/list")
-	public ResponseEntity<List<PacienteResponse>> list(){
-			return ResponseEntity.ok(pacienteService.getAllPaciente());
+	@GetMapping("/getList")
+	public ResponseEntity<List<PacienteResponse>> list(@RequestBody PacienteRequest request){
+		   return ResponseEntity.ok(
+		    	                   (request.getName()==null)?pacienteService.getAllPaciente():
+		    		                            pacienteService.getNameContaning(
+		    			                        		 new PacienteRequest(null,request.getName())));
 	}
 	
-	@GetMapping("/find/{id}")
-	public ResponseEntity<PacienteResponse> findByPaciente(PacienteRequest pacienteRequest){
+	@GetMapping("/find")
+	public ResponseEntity<PacienteResponse> findByPaciente(@RequestBody PacienteRequest pacienteRequest){
+		if(!pacienteRequest.getId().equals(null)) {
 			return ResponseEntity.ok(pacienteService.findByPaciente(pacienteRequest));
+		}else {
+			return ResponseEntity.ok(new PacienteResponse());
+		}
+	}
+		
+	@PostMapping("/save")
+	public ResponseEntity<?> save(@RequestBody PacienteResponse pacienteResponse ){
+		return ResponseEntity.ok(pacienteService.save(pacienteResponse));
 	}
 	
-	
+	@PutMapping("/update")
+	public ResponseEntity<?> update(@RequestBody PacienteResponse pacienteResponse){
+		return ResponseEntity.ok(pacienteService.update(pacienteResponse));
+	}
 	
 }

@@ -6,7 +6,8 @@ public interface IGeneric<D,E> {
 
 	List<D> getAllPaciente();
 	D findByPaciente(E e);
-	D getNameContaning(E e);
-	
+	List<D> getNameContaning(E e);
+	String save(D d);
+	String update(D d);
 	
 }

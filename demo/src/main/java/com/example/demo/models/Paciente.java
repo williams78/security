@@ -2,8 +2,6 @@ package com.example.demo.models;
 
 import java.util.Date;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,10 +13,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name="paciente")
 public class Paciente {
