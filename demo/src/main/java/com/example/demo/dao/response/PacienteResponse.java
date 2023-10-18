@@ -19,6 +19,7 @@ public class PacienteResponse {
 
 	private Long nopaciente;
 	private String name;
+	private Integer age;
 	private String street;
 	private int numero_exterior;
 	private int numero_interior;
