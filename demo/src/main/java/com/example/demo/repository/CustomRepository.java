@@ -8,13 +8,16 @@ import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import com.example.demo.models.FieldsValues;
 import com.example.demo.service.IEntityRepository;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,10 +32,10 @@ public class CustomRepository implements IEntityRepository{
 	private Field[] Fieldsp;
 	private Object[] fieldspValue;
 	private int SaveOrUpdate = 1;
-	
+		
 	@Override
-	public <T> List<T> getAllRecords(Class<T> clazz) {
-		return jdbcTemplate.query("select * from " + clazz.getSimpleName(), new LombokRowMapper<T>( clazz ));
+	public <T> List<T> getAllRecords( Class<T> clazz) {
+		return jdbcTemplate.query("select * from " + clazz.getSimpleName() , new LombokRowMapper<T>( clazz ));
 	}
 
 	@Override
@@ -53,19 +56,18 @@ public class CustomRepository implements IEntityRepository{
 	}
 
 	@Override
-	public <T> T FindById(Long id, Class<T> clazz) {
-		String sql = "Select * from " + clazz.getSimpleName() + " where nopaciente = " + id;
-         System.out.println(new LombokRowMapper<>(clazz));
+	public <T> T FindByRecord(FieldsValues[] object, Class<T> clazz) { 
+		String sql = "Select * from " + clazz.getSimpleName() + " where " + object[0].getNamefield() + " = " + object[0].getId();
 		return jdbcTemplate.queryForObject(sql, new LombokRowMapper<>(clazz));
 	}
 
 	@Override
 	public <T> List<T> getRecordsContaning(Class<T> clazz,  String name) {
-		return jdbcTemplate.query("Select * from " + clazz.getSimpleName() + " where name like '%" + name + "%'", new LombokRowMapper<>(clazz));
-	}
+		return jdbcTemplate.query("Select * from " + clazz.getSimpleName() + " where name like '%" + name + "%'", new LombokRowMapper<T>(clazz));
+	} 
 
 	@Override
-	public <T> int UpdateRecord(T update) {
+	public <T> int UpdateRecord(T update, FieldsValues[] object) {
     
 		SaveOrUpdate = 0;
 		
@@ -78,21 +80,43 @@ public class CustomRepository implements IEntityRepository{
             .append( " set " );
 		
         for (int i = 0; i<fieldsp.length; i++) {
-		
-			if(!fieldsp[i].equals("nopaciente")) {
+		     
+			if(!ValidationString(fieldsp[i].toString(), object)) {
 				sql.append(fieldsp[i]).append("=").append("'").append(fieldspValue[i]).append("'");
-			}else {
-			   	sqle.append(" where nopaciente=").append(fieldspValue[i]);
 			}
-			if(i!=fieldsp.length-1 && !fieldsp[i].equals("nopaciente")) {
+			if(i!=fieldsp.length-object.length && !ValidationString(fieldsp[i].toString(), object)) {
 				sql.append(",");
 			}
 		 }
        
+         for(int j=0; j<object.length; j++) {
+        	 
+        	 if(j==0) {
+        		 sqle = sqle.append(" where ").append(object[j].getNamefield().toString()).append(" = ")
+        				 .append(object[j].getId().toString()); 
+        	 }else {
+        		 
+        		 sqle.append(" and ").append(object[j].getNamefield()).append("=").append(object[j].getId());
+        	 }
+        	 
+         }
+        
 		sql.append(sqle);
-     
+              
 		return jdbcTemplate.update(sql.toString());
 
+	}
+	
+	private boolean ValidationString(String field, FieldsValues[] object) {
+		boolean res = false;
+		for(int i=0; i<object.length;i++) {
+			
+			if(object[i].getNamefield().equals(field)) {
+				res = true;
+			}
+		}
+		
+		return res;
 	}
 
 	@Override
@@ -123,20 +147,21 @@ public class CustomRepository implements IEntityRepository{
                 
 				Method[] m = row.getClass().getDeclaredMethods();
 				
-			
+				
 				
                 for ( int i=0; i<m.length; i++ ) {
-                    	
+                	 	
                 	int pos = -1;
                 	
                     try { 
                     	
+                    	
                     	pos = rs.findColumn(  m[i].getName()  );
-                     
+                    	    
                      } catch ( SQLException ex ) {  }
 
                     if ( pos != -1 ) {
-                    
+                    	
                         Object fieldValue = rs.getObject( pos );
                         	
                         m[i].invoke( row, fieldValue );
@@ -174,6 +199,17 @@ public class CustomRepository implements IEntityRepository{
 			}
 		}
 	}
+
+@Override
+public <T> List<T> FindByRecords(FieldsValues[] object, Class<T> clazz) {
+	String sql = "Select * from " + clazz.getSimpleName() + " where " + object[0].getNamefield() + " = " + object[0].getId();
+	return jdbcTemplate.query(sql, new LombokRowMapper<>(clazz));
+}
+
+
+
+
+
    
   
 	

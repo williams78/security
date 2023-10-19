@@ -1,10 +1,8 @@
 package com.example.demo.dao.response;
 
+import java.util.List;
 
-
-
-import java.util.Date;
-
+import com.example.demo.models.Ficha;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.OptBoolean;
 

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.dao.request.PacienteRequest;
@@ -29,17 +30,18 @@ public class AuthorizationController {
 	private static final Logger logger = LoggerFactory.getLogger(AuthorizationController.class);
 	
 	@GetMapping("/getList")
-	public ResponseEntity<List<PacienteResponse>> list(@RequestBody PacienteRequest request){
-		   return ResponseEntity.ok(
-		    	                   (request.getName()==null)?pacienteService.getAllPaciente():
+	public ResponseEntity<List<PacienteResponse>> list(@RequestParam(name="name", required = false) String name){
+		logger.info(name);
+		return ResponseEntity.ok(
+		    	                   (name==null)?pacienteService.getAll():
 		    		                            pacienteService.getNameContaning(
-		    			                        		 new PacienteRequest(null,request.getName())));
+		    			                        		 new PacienteRequest(null,name)));
 	}
 	
 	@GetMapping("/find")
-	public ResponseEntity<PacienteResponse> findByPaciente(@RequestBody PacienteRequest pacienteRequest){
-		if(!pacienteRequest.getId().equals(null)) {
-			return ResponseEntity.ok(pacienteService.findByPaciente(pacienteRequest));
+	public ResponseEntity<PacienteResponse> findByPaciente(@RequestParam(name="id", required = true) Long id){
+		if(!id.equals(null)) {
+			return ResponseEntity.ok(pacienteService.findBy(new PacienteRequest(id,null)));
 		}else {
 			return ResponseEntity.ok(new PacienteResponse());
 		}
