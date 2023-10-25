@@ -1,5 +1,6 @@
 package com.example.demo.dao.response;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.demo.models.Ficha;
@@ -41,4 +42,5 @@ public class PacienteResponse {
 	private String fecha_ultima_visita;
 	private String familiar;
 	private String recomendado_por;
+	private Long telefonos[] ;
 }
